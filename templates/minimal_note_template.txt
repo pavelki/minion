@@ -1,0 +1,5 @@
+{today} {topic}
+{underline}
+:date: {today}
+:tags: 
+

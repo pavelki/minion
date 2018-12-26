@@ -22,7 +22,7 @@ LOGGER = logging.getLogger(__name__)
 
 CONFIG_FILE = '~/.minion'
 
-# Linux preferred apps to view files:
+# Linux preferred apps to view non-text files:
 NON_TEXT_VIEWERS = {
     'default': 'cat %s | less',
     '.pdf': 'evince',
@@ -35,7 +35,7 @@ NON_TEXT_VIEWERS = {
     '.xlsx': 'libreoffice',
 }
 
-# Mac OSX 10.9 preferred apps to view files:
+# Mac OSX preferred apps to view non-text files:
 if 'Darwin' in platform.platform():
     NON_TEXT_VIEWERS = {
         'default': '/usr/bin/open',
@@ -50,9 +50,10 @@ if 'Darwin' in platform.platform():
         '.pdf': '/usr/bin/open',
         '.xls': '/usr/bin/open',
         '.xlsx': '/usr/bin/open',
+        '.xmind': '/usr/bin/open',
     }
 
-# Cygwin preferred apps to view files:
+# Cygwin preferred apps to view non-text files:
 if 'CYGWIN' in platform.platform():
     NON_TEXT_VIEWERS = {
         'default': 'cat %s | less',
@@ -72,7 +73,7 @@ if 'CYGWIN' in platform.platform():
 ################################################################################
 
 def _settings_parser(default_notes_dir='~/minion/notes'):
-    ''' Create the parser for the settings file. 
+    ''' Create the parser for the settings file.
 
     Include sensible default values.
     '''
@@ -107,8 +108,8 @@ def _settings_parser(default_notes_dir='~/minion/notes'):
 
 def get_settings(config_file=CONFIG_FILE):
     ''' Fetch all settings from config file.
-    If config file does not exist, 
-    create it will default settings.
+    If config file does not exist,
+    create it with default settings.
     '''
     minion_file = os.path.expanduser(config_file)
 

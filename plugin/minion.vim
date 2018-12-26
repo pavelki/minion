@@ -64,8 +64,8 @@ if len(match_files) > 0:
 
         # Open the item in a new buffer.
         vim.command("badd %(item)s" % {'item':item})
-        # Switch to the next buffer, in case we ran from an empty Vim window.
-        vim.command("bn")
+        # Switch to the new buffer
+        vim.command("buffer %(item)s" % {'item':item})
 else:
     vim.command('echom "No matching results."')
 
