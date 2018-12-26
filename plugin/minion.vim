@@ -12,7 +12,7 @@ if !has('python3')
 let s:path = expand('<sfile>:p:h')
 
 " Setup for Python library imports.
-python << endpython
+python3 << EOF
 import sys
 import os
 import vim
@@ -21,7 +21,7 @@ lib_path = os.path.join(script_path, '..')
 sys.path.insert(0, lib_path)
 
 import brain_of_minion as brain
-endpython
+EOF
 
 " =================
 " Minion Functions
@@ -33,7 +33,7 @@ let s:path = expand('<sfile>:p:h')
 " -----------------------------------
 
 function! MinionOpen(keywords, archives)
-python << endpython
+python3 << EOF
 
 args = {
     'keyword_string': vim.eval("a:keywords"),
@@ -69,11 +69,11 @@ if len(match_files) > 0:
 else:
     vim.command('echom "No matching results."')
 
-endpython
+EOF
 endfunction
 
 function! MinionOpenAll(keywords, archives)
-python << endpython
+python3 << EOF
 do_not_open = ['.jpg', '.jpeg', '.pdf', '.png', '.rtf', '.xls']
 args = {
     'keyword_string': vim.eval("a:keywords"),
@@ -112,19 +112,19 @@ for item in match_files:
 
 # Show the list of open buffers.
 vim.command("buffers")
-endpython
+EOF
 endfunction
 
 " Archive the current open file.
 " -------------------------------
 function! MinionArchive()
     let s:current_file = expand('%')
-python << endpython
+python3 << EOF
 current_file = vim.eval("s:current_file")
 
 # This call will nicely display message on success, already.
 brain.archive(current_file)
-endpython
+EOF
 " Delete the buffer, since we moved the file.
 bd
 " echom "Archived " 
@@ -134,13 +134,13 @@ endfunction
 " -------------------------------------
 function! MinionMove(folder)
     let s:current_file = expand('%')
-python << endpython
+python3 << EOF
 args = {
     'folder':vim.eval("a:folder"),
     'filename':vim.eval("s:current_file"),
 }
 brain.move_to_folder(**args)
-endpython
+EOF
 bd
 endfunction
 
@@ -149,7 +149,7 @@ endfunction
 " -------------------------------------
 function! MinionSummary()
     let s:current_file = expand('%')
-python << EOF
+python3 << EOF
 print(brain.folder_summary(limit=20))
 EOF
 bd
@@ -157,7 +157,7 @@ endfunction
 
 function! MinionFavorites()
     let s:current_file = expand('%')
-python << EOF
+python3 << EOF
 print(brain.print_favorites_summary())
 EOF
 bd
@@ -171,7 +171,7 @@ endfunction
 " -------------------------------------
 function! MinionRename(new_name)
     let s:current_file = expand('%')
-python << EOF
+python3 << EOF
 
 # Construct the new filename
 new_name = vim.eval("a:new_name")
@@ -201,7 +201,7 @@ endfunction
 " -------------------------------------
 function! MinionNote(keywords)
     let s:current_file = expand('%')
-python << EOF
+python3 << EOF
 # Create the file
 new_name = vim.eval("a:keywords")
 args = {
@@ -220,7 +220,7 @@ endfunction
 " ------------------------------------------------------
 "  i.e. weekly, weekend, journal
 function! MinionTemplate(template, topic)
-python << EOF
+python3 << EOF
 
 # Create a file from template.
 args = {
@@ -253,7 +253,7 @@ endfunction
 "           Con: Let's let other systems own the filename, not Minion.
 function! MinionTag(keywords)
     let s:current_file = expand('%')
-python << EOF
+python3 << EOF
 # Create the file
 args = {
     'tags':vim.eval("a:keywords").split(' '),
