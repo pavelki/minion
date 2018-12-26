@@ -23,6 +23,7 @@ LOGGER = logging.getLogger(__name__)
 CONFIG_FILE = '~/.minion'
 
 # Linux preferred apps to view non-text files:
+# The keys are also used to mark files that should not be parsed by minion
 NON_TEXT_VIEWERS = {
     'default': 'cat %s | less',
     '.pdf': 'evince',
@@ -36,6 +37,7 @@ NON_TEXT_VIEWERS = {
 }
 
 # Mac OSX preferred apps to view non-text files:
+# The keys are also used to mark files that should not be parsed by minion
 if 'Darwin' in platform.platform():
     NON_TEXT_VIEWERS = {
         'default': '/usr/bin/open',
@@ -48,12 +50,14 @@ if 'Darwin' in platform.platform():
         '.jpg': '/usr/bin/open',
         '.jpeg': '/usr/bin/open',
         '.pdf': '/usr/bin/open',
+        '.png': '/usr/bin/open',
         '.xls': '/usr/bin/open',
         '.xlsx': '/usr/bin/open',
         '.xmind': '/usr/bin/open',
     }
 
 # Cygwin preferred apps to view non-text files:
+# The keys are also used to mark files that should not be parsed by minion
 if 'CYGWIN' in platform.platform():
     NON_TEXT_VIEWERS = {
         'default': 'cat %s | less',
@@ -261,12 +265,17 @@ def get_file_content(filename, include_filename=True):
     content = ""
 
     # Don't try to get non-text content.
+    # If it happens anyway, gracefully ignore the file
     _, extension = os.path.splitext(filename)
-    extension.lower()
+    extension = extension.lower()
     if extension not in NON_TEXT_VIEWERS:
         f = open(filename, 'r')
-        content = f.read()
-        f.close()
+        try:
+            content = f.read()
+        except:
+            content = ""
+        finally:
+            f.close()
 
     # Always treat the filename as if part of the content.
     if include_filename:
@@ -372,10 +381,6 @@ def remind(text):
     f.write(text)
     f.close()
     return filename
-
-
-def remove_archives(file_list):
-    return remove_notes(file_list, ['archive'])
 
 
 def get_remove_tags(text_string):
@@ -550,20 +555,6 @@ def limit_notes(choice, notes, full=False):
                 if choice in content:
                     new_array.append(note)
     return new_array
-
-
-def remove_notes(file_list, terms):
-    new_list = []
-    for f in file_list:
-        matches_term = False
-        low_f = f.lower()
-        for term in terms:
-            term = term.lower()
-            if low_f.count(term) > 0:
-                matches_term = True
-        if not matches_term:
-            new_list.append(f)
-    return new_list
 
 
 def clean_file_name(text):
@@ -1052,6 +1043,7 @@ def hasCalendarTag(text):
 
 def get_files(directory, archives=False):
     ''' Called by find_files to get a list of files, before sorting. '''
+
     included_exts_string =\
         GLOBAL_SETTINGS.get('notes', 'notes_included_extensions').\
         replace(' ', '')
@@ -1062,6 +1054,22 @@ def get_files(directory, archives=False):
     excluded_exts = excluded_exts_string.split(',')
 
     dir_list = os.listdir(directory)
+
+    # We have to iterate over a copy of the list
+    # because we are modifying the list in the loop
+    dir_list_copy = dir_list.copy()
+    for dir_name in dir_list_copy:
+
+        # Remove all hiddent directories and files from the list
+        if dir_name.startswith('.'):
+            dir_list.remove(dir_name)
+
+        if not archives:
+            # Remove archive items from the list
+            # - all archive folders start with "archive." substring
+            if dir_name.lower().startswith('archive.'):
+                dir_list.remove(dir_name)
+
     files = []
     for item in dir_list:
         dirName = os.path.join(directory, item)
@@ -1081,9 +1089,6 @@ def get_files(directory, archives=False):
                         break
             if not file_excluded and file_included:
                 files.append("%s/%s" % (directory, item))
-
-    if not archives:
-        files = remove_archives(files)
 
     return files
 
