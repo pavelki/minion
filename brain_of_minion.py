@@ -7,7 +7,7 @@ import shutil
 import os
 from datetime import date, timedelta, datetime, time
 import re
-from ConfigParser import SafeConfigParser
+from configparser import SafeConfigParser
 from collections import defaultdict
 import logging
 import platform
@@ -190,21 +190,21 @@ def list_stray_files(count=2):
 
 def sort_files_interactive(match_files):
     ''' Interactively sort the list of files. '''
-    print "Enter '?' to see available actions."
+    print("Enter '?' to see available actions.")
     total = len(match_files)
     count = 0
     to_open = []
     for item in match_files:
         count += 1
         # Show progress...
-        print
-        print to_bar(count, total)
+        print()
+        print(to_bar(count, total))
         # The main call...
         files_to_open = doInboxInteractive(item)
         to_open.extend(files_to_open)
 
     if len(to_open) > 0:
-        print "Files to open:\n  %s" % '\n  '.join(to_open)
+        print("Files to open:\n  %s" % '\n  '.join(to_open))
         open_files(to_open)
 
 
@@ -237,7 +237,7 @@ def get_unique_dates(content):
                 except ValueError:
                     pass
                 except TypeError:
-                    print "Ignored " + match
+                    print("Ignored " + match)
 
     if len(dates) == 0:
         return None
@@ -290,7 +290,7 @@ def limit_to_year(year, file_list):
 
     # TODO: Sort the collection
     sorted_results = []
-    for _, files in results.items():
+    for _, files in list(results.items()):
         for filename in files:
             sorted_results.append(filename)
 
@@ -344,20 +344,20 @@ def select_file(match_files, max_files=10):
 
     while len(match_files) > 1:
         if len(match_files) > max_files:
-            print "%d matches." % len(match_files)
+            print("%d matches." % len(match_files))
         else:
             display_output('Notes (most recent first):', match_files,
                            max_display=20)
-            choice = raw_input(
+            choice = input(
                 "Selection? ('!' selects the first file, 'q' quits): ")
         if choice == '!':
             break
         if choice == 'q':
-            print "Exiting ...\n"
+            print("Exiting ...\n")
             sys.exit()
         less_match_files = limit_notes(choice, match_files, True)
         if len(less_match_files) == 0:
-            print "No %s %s matches." % (choice_path, choice)
+            print("No %s %s matches." % (choice_path, choice))
         else:
             choice_path += '-' + choice
             match_files = less_match_files
@@ -458,7 +458,7 @@ def display_output(title, output, by_tag=False,
                    raw_files=False, max_display=None):
     # If empty list or empty string, etc:
     if not output:
-        print "No %s items.\n" % title
+        print("No %s items.\n" % title)
         return
 
     # Print dictionaries as key - value
@@ -478,9 +478,9 @@ def display_output(title, output, by_tag=False,
                 output.append("{} more results...".format(remain))
 
     if title:
-        print "---- %s: " % title
+        print("---- %s: " % title)
 
-    print output
+    print(output)
 
 
 def clean_output(output):
@@ -599,9 +599,9 @@ def file_to_stdout(filename):
     f = open(filename, 'r')
     content = f.read()
     f.close()
-    print content
+    print(content)
     # One extra line break is wise, in case the file does not end with one.
-    print '\n'
+    print('\n')
 
 
 def get_windows_path(cygwin_path):
@@ -741,7 +741,7 @@ def get_folder(folder):
 def limit_notes_interactive(notes):
     while len(notes) > 1:
         display_output('Multiple Matches', notes)
-        choice = raw_input('Choice? ')
+        choice = input('Choice? ')
         notes = limit_notes(choice, notes)
     return notes[0]
 
@@ -871,8 +871,8 @@ def add_tags(tags, content):
     TAG_INDICATOR = get_setting('compose', 'tagline')
 
     if ' ' in TAG_INDICATOR:
-        print "WARNING: Spaces in the [compose] tagline= setting \
-            may cause tag duplication."
+        print("WARNING: Spaces in the [compose] tagline= setting \
+            may cause tag duplication.")
 
     all_tags = []
     updated_content = []
@@ -925,12 +925,12 @@ def archive(filename):
     # get_folder does some cleverness with the 'archive' name.
     folder = get_folder('archive')
     filename = move_to_folder(filename, folder)
-    print "Moved to %s" % folder
+    print("Moved to %s" % folder)
 
 
 def rename_note(filename, new_name):
     if len(new_name) == 0:
-        new_name = raw_input('New name? ')
+        new_name = input('New name? ')
     new_name = string_to_file_name(new_name)
     new_file = "%s/%s" % (get_inbox(), new_name)
     new_file = rename_file(filename, new_file)
@@ -942,13 +942,13 @@ def check_add_remove_tags(filename, command):
     tags_to_add = get_tags_from_string(command)
     if len(tags_to_add) > 0:
         add_tags_to_file(tags_to_add, filename)
-        print "Tag(s) %s added." % str(tags_to_add)
+        print("Tag(s) %s added." % str(tags_to_add))
 
     # if there are any tags to be removed, remove them
     remove_tags = get_remove_tags(command)
     if len(remove_tags) > 0:
         remove_tags_from_file(remove_tags, filename)
-        print "Tag(s) %s removed." % str(remove_tags)
+        print("Tag(s) %s removed." % str(remove_tags))
 
     if len(tags_to_add) > 0 or len(remove_tags) > 0:
         return True
@@ -964,26 +964,26 @@ def check_move_note(filename, command):
         folder = folder.replace('>', '')
         folder = os.path.expanduser(folder)
         filename = move_to_folder(filename, folder)
-        print "Moved to %s" % folder
+        print("Moved to %s" % folder)
     return filename
 
 
 def delete_note(filename):
-    action = raw_input(
+    action = input(
         'Delete note %s? (type "YES" to confirm): '
         % filename)
     if action == "YES":
         os.remove(filename)
-        print "Note %s was deleted!" % filename
+        print("Note %s was deleted!" % filename)
     else:
-        print "Note %s was NOT deleted." % filename
+        print("Note %s was NOT deleted." % filename)
 
 
 def apply_command_to_file(filename, command):
     ''' The core of the interactive file sorting system. '''
     command = expand_short_command(command)
     if '!help' in command:
-        print get_sort_menu() + '\n'
+        print(get_sort_menu() + '\n')
         doInboxInteractive(filename)
 
     if '!edit' in command:
@@ -1007,7 +1007,7 @@ def apply_command_to_file(filename, command):
     # If there's a calendar tag...move to the calendar folder.
     if hasCalendarTag(command):
         filename = move_to_folder(filename, 'calendar')
-        print "Moved %s to calendar folder." % filename
+        print("Moved %s to calendar folder." % filename)
     else:
         # Move elsewhere if requested.
         filename = check_move_note(filename, command)
@@ -1017,7 +1017,7 @@ def apply_command_to_file(filename, command):
         doInboxInteractive(filename)
 
     if '!quit' in command:
-        print "Exiting sort ...\n"
+        print("Exiting sort ...\n")
         sys.exit()
 
     return filename
@@ -1026,7 +1026,7 @@ def apply_command_to_file(filename, command):
 def doInboxInteractive(item):
     to_open = []
     display_output('Selected', item, by_tag=False)
-    choice = raw_input('Action? ')
+    choice = input('Action? ')
     if len(choice) > 0:
         # some commands can change the name of the file/item
         item = apply_command_to_file(item, choice)
@@ -1102,11 +1102,11 @@ def log_line_to_file(filename, line):
     log_line_template = "\n{date} {time} : {line}"
     new_line = log_line_template.format(**params)
 
-    print "Appending new line to %s" % filename
+    print("Appending new line to %s" % filename)
     f = open(filename, 'a')
     f.write(new_line)
     f.close()
-    print new_line
+    print(new_line)
     return
 
 
@@ -1134,7 +1134,7 @@ def choose_file(filter=[], archives=False, full_text=False):
         filename = match_files[0]
         return filename, [filename]
     else:
-        print "No matches, suggesting new filename."
+        print("No matches, suggesting new filename.")
         filename = get_filename_for_topic(' '.join(filter))
         return filename, []
 
@@ -1232,7 +1232,7 @@ def get_unique_name(filename):
             # In case there is no dot.
             short_name = short_name + uid
         final_name = os.path.join(directory, short_name)
-        print "Name conflict. Renamed to " + final_name
+        print("Name conflict. Renamed to " + final_name)
     return final_name
 
 
@@ -1243,7 +1243,7 @@ def rename_file(filename, new_name):
     if filename != new_file:
         new_file = get_unique_name(new_file)
         shutil.move(filename, new_file)
-        print "Renamed " + filename + " to " + new_file
+        print("Renamed " + filename + " to " + new_file)
     return new_file
 
 
@@ -1262,7 +1262,7 @@ def move_to_folder(filename, folder):
         raise ex
         destination = get_inbox()
         new_file_name = "%s/%s" % (destination, os.path.basename(filename))
-        print "Error: Moved %s to inbox." % new_file_name
+        print("Error: Moved %s to inbox." % new_file_name)
         shutil.move(filename, destination)
 
 
@@ -1271,7 +1271,7 @@ def remove_empty_folder(folder):
     '''
     if len(os.listdir(folder)) == 0:
         os.rmdir(folder)
-        print "Removed empty folder " + folder + "."
+        print("Removed empty folder " + folder + ".")
 
 
 def get_sort_menu():
@@ -1392,7 +1392,7 @@ def new_note_interactive(topic_fragments, note_template, quick=False,
     if not quick:
         open_in_editor(filename, line=last_line)
     else:
-        print "Note '%s' created ..." % filename
+        print("Note '%s' created ..." % filename)
     return (filename, last_line)
 
 
@@ -1412,7 +1412,7 @@ def create_new_note(topic, note_template=None, notes_dir=None,
     if filename_template is None:
         template_content = get_template_content(note_template)
         filename_template = template_content.split('\n')[0]
-    print "Note template used: " + note_template
+    print("Note template used: " + note_template)
 
     filename = get_filename_for_topic(topic, notes_dir, filename_template)
     last_line = 0

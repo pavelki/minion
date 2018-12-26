@@ -4,8 +4,8 @@
 "
 " ---------------------------------------------------------
 
-if !has('python')
-    echo "Error: Minion requires vim compiled with +python"
+if !has('python3')
+    echo "Error: Minion requires vim compiled with +python3"
         finish
     endif
 
@@ -150,7 +150,7 @@ endfunction
 function! MinionSummary()
     let s:current_file = expand('%')
 python << EOF
-print brain.folder_summary(limit=20)
+print(brain.folder_summary(limit=20))
 EOF
 bd
 endfunction
@@ -158,7 +158,7 @@ endfunction
 function! MinionFavorites()
     let s:current_file = expand('%')
 python << EOF
-print brain.print_favorites_summary()
+print(brain.print_favorites_summary())
 EOF
 bd
 endfunction
