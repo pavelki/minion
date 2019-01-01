@@ -353,13 +353,16 @@ def select_file(match_files, max_files=10):
         return (choice_path, '')
 
     while len(match_files) > 1:
+        # make sure the variable is of type int
+        max_files = int(max_files)
+
         if len(match_files) > max_files:
             print("%d matches." % len(match_files))
-        else:
-            display_output('Notes (most recent first):', match_files,
-                           max_display=20)
-            choice = input(
-                "Selection? ('!' selects the first file, 'q' quits): ")
+
+        display_output('Notes (most recent first):', match_files,
+                        max_display=20)
+        choice = input(
+            "Selection? ('!' selects the first file, 'q' quits): ")
         if choice == '!':
             break
         if choice == 'q':
