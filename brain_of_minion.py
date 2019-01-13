@@ -40,7 +40,7 @@ NON_TEXT_VIEWERS = {
 # The keys are also used to mark files that should not be parsed by minion
 if 'Darwin' in platform.platform():
     NON_TEXT_VIEWERS = {
-        'default': '/usr/bin/open',
+        'default': 'cat %s | less',
         '.doc': '/usr/bin/open',
         '.docx': '/usr/bin/open',
         '.gdoc': '/usr/bin/open',
